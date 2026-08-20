@@ -29,6 +29,7 @@ typedef enum rtsyn_spsc_telemetry_message_type_e {
     RTSYN_SPSC_TELEMETRY_MESSAGE_TYPE_NODE_STATUS,
     RTSYN_SPSC_TELEMETRY_MESSAGE_TYPE_VALUES_WRITTEN,
     RTSYN_SPSC_TELEMETRY_MESSAGE_TYPE_CIRCUIT_SNAPSHOT,
+    RTSYN_SPSC_TELEMETRY_MESSAGE_TYPE_MEASUREMENT,
     RTSYN_SPSC_TELEMETRY_MESSAGE_TYPE_DROPPED,
     RTSYN_SPSC_TELEMETRY_MESSAGE_TYPE_MAX,
 } rtsyn_spsc_telemetry_message_type_t;
@@ -102,6 +103,20 @@ typedef struct rtsyn_spsc_telemetry_message_circuit_snapshot_e {
     uint32_t value_count;
 } rtsyn_spsc_telemetry_message_circuit_snapshot_t;
 
+typedef struct rtsyn_spsc_telemetry_message_measurement_e {
+    uint64_t cycle_id;
+    uint64_t period_ns;
+    uint64_t actual_period_ns;
+    uint64_t latency_ns;
+    uint64_t wake_lateness_ns;
+    uint64_t skipped_cycle_count;
+    uint64_t devices_read_ns;
+    uint64_t plugins_time_ns;
+    uint64_t devices_write_ns;
+    uint32_t missed_cycle;
+    uint32_t deadline_missed;
+} rtsyn_spsc_telemetry_message_measurement_t;
+
 /**
  * @brief Reports telemetry loss observed by the producer.
  *
@@ -139,6 +154,7 @@ typedef struct rtsyn_spsc_telemetry_message_e {
         rtsyn_spsc_telemetry_message_node_status_t node_status;
         rtsyn_spsc_telemetry_message_values_written_t values_written;
         rtsyn_spsc_telemetry_message_circuit_snapshot_t circuit_snapshot;
+        rtsyn_spsc_telemetry_message_measurement_t measurement;
         rtsyn_spsc_telemetry_message_dropped_t dropped;
     } data;
 } rtsyn_spsc_telemetry_message_t;
@@ -157,9 +173,11 @@ RTSYN_SPSC_STATIC_ASSERT(sizeof(rtsyn_spsc_telemetry_message_values_written_t) =
                          "telemetry values-written payload ABI changed");
 RTSYN_SPSC_STATIC_ASSERT(sizeof(rtsyn_spsc_telemetry_message_circuit_snapshot_t) == 32,
                          "telemetry circuit snapshot payload ABI changed");
+RTSYN_SPSC_STATIC_ASSERT(sizeof(rtsyn_spsc_telemetry_message_measurement_t) == 80,
+                         "telemetry measurement payload ABI changed");
 RTSYN_SPSC_STATIC_ASSERT(sizeof(rtsyn_spsc_telemetry_message_dropped_t) == 24,
                          "telemetry dropped payload ABI changed");
-RTSYN_SPSC_STATIC_ASSERT(sizeof(rtsyn_spsc_telemetry_message_t) == 72,
+RTSYN_SPSC_STATIC_ASSERT(sizeof(rtsyn_spsc_telemetry_message_t) == 112,
                          "telemetry message IPC ABI changed");
 RTSYN_SPSC_STATIC_ASSERT(RTSYN_SPSC_ALIGNOF(rtsyn_spsc_telemetry_message_t) == 8,
                          "telemetry message alignment ABI changed");
